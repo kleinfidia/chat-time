@@ -7,6 +7,7 @@ const LoginScreen = () => {
 
     const screenwidth= Math.round(Dimensions.get("window").width);
     const [email, setemail] = useState("");
+    const [password, setpassword] = useState("")
   
   return (
     <View className =" flex-1 items-center justify-start">
@@ -23,9 +24,10 @@ const LoginScreen = () => {
           {/* alert */}
 
           {/* email */} 
-          <UserinputText placeholder ="Email" isPass={false} setStatValue={email} setStateFunction={setemail}/>
+          <UserinputText placeHolder ="Email" isPass={false} setStatValue={setemail} />
 
           {/* password */}
+          <UserinputText placeHolder ="password" isPass={false} setStatValue={setemail} />
 
           {/* login */}
 
@@ -35,4 +37,4 @@ const LoginScreen = () => {
   )
 }
 
-export default LoginScreen
+export default LoginScreen;
