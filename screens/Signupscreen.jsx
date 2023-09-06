@@ -8,7 +8,7 @@ import { avatars } from "../utils/supports";
 import { MaterialIcons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { firebaseAuth, firestoreDB } from "../config/firebase.config";
+import { firebaseAuth, firestoreDB } from "../configs/firebase.config";
 import { doc, setDoc } from "firebase/firestore";
 
 const Signupscreen = () => {

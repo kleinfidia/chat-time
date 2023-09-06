@@ -4,7 +4,7 @@ import { FontAwesome, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import { doc, setDoc } from "firebase/firestore";
-import { firestoreDB } from "../config/firebase.config";
+import { firestoreDB } from "../configs/firebase.config";
 
 const AddTochatScreen = () => {
   const navigation = useNavigation();
@@ -21,12 +21,14 @@ const AddTochatScreen = () => {
     };
 
     if (addChat !== "") {
-      setDoc(doc(firestoreDB, "chats", id), _doc).then(() => {
-        setaddChat("");
-        navigation.replace("HomeScreen");
-      }).catch((err) => {
-        alert("error:", err)
-      })
+      setDoc(doc(firestoreDB, "chats", id), _doc)
+        .then(() => {
+          setaddChat("");
+          navigation.replace("HomeScreen");
+        })
+        .catch((err) => {
+          alert("error:", err);
+        });
     }
   };
 

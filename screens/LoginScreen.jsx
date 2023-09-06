@@ -5,7 +5,7 @@ import { UserinputText } from "../components";
 import { TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { firebaseAuth, firestoreDB } from "../config/firebase.config";
+import { firebaseAuth, firestoreDB } from "../configs/firebase.config";
 import { doc, getDoc } from "firebase/firestore";
 import { useDispatch } from "react-redux";
 import { SET_USER } from "../context/actions/userActions";
@@ -38,7 +38,7 @@ const LoginScreen = () => {
               }
             );
           }
-        }) 
+        })
         .catch((err) => {
           console.log("error:", err.message);
           if (err.message.includes("wrong-password")) {

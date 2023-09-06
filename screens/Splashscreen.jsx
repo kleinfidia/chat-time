@@ -2,7 +2,7 @@ import { View, Text, Image, ActivityIndicator } from "react-native";
 import React, { useLayoutEffect } from "react";
 import { Logo } from "../assets";
 import { useNavigation } from "@react-navigation/native";
-import { firebaseAuth, firestoreDB } from "../config/firebase.config";
+import { firebaseAuth, firestoreDB } from "../configs/firebase.config";
 import { doc, getDoc } from "firebase/firestore";
 import { useDispatch } from "react-redux";
 import { SET_USER } from "../context/actions/userActions";
