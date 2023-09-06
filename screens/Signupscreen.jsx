@@ -7,6 +7,9 @@ import { useNavigation } from "@react-navigation/native";
 import { avatars } from "../utils/supports";
 import { MaterialIcons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { firebaseAuth, firestoreDB } from "../config/firebase.config";
+import { doc, setDoc } from "firebase/firestore";
 
 const Signupscreen = () => {
   const screenwidth = Math.round(Dimensions.get("window").width);
@@ -23,8 +26,29 @@ const Signupscreen = () => {
   const navigation = useNavigation();
 
   const handleAvatar = (item) => {
-    setisAvatarmenu(false);
     setavatar(item?.image.asset.url);
+    setisAvatarmenu(false);
+  };
+
+  const handleSignUp = async () => {
+    if (getemailValidationstatus && email !== "") {
+      await createUserWithEmailAndPassword(firebaseAuth, email, password).then(
+        (userCred) => {
+          const data = {
+            _id: userCred?.user.uid,
+            fullName: name,
+            profilePic: avatar,
+            providerData: userCred.user.providerData[0],
+          };
+
+          setDoc(doc(firestoreDB, "users", userCred?.user.uid), data).then(
+            () => {
+              navigation.navigate("LoginScreen");
+            }
+          );
+        }
+      );
+    }
   };
 
   return (
@@ -114,7 +138,10 @@ const Signupscreen = () => {
           />
 
           {/* login */}
-          <TouchableOpacity className=" w-full px-4 py-2 rounded-xl bg-primary my-3 flex items-center justify-center">
+          <TouchableOpacity
+            onPress={handleSignUp}
+            className=" w-full px-4 py-2 rounded-xl bg-primary my-3 flex items-center justify-center"
+          >
             <Text className=" py2 text-white text-xl font-semibold">
               Sign up
             </Text>
