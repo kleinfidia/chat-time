@@ -7,16 +7,35 @@ import {
   ScrollView,
   ActivityIndicator,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useLayoutEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Logo } from "../assets";
 import { FontAwesome5, Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
+import { firestoreDB } from "../configs/firebase.config";
 
 const HomeScreen = () => {
   const user = useSelector((state) => state.user.user);
-  const [isloading, setisloading] = useState(false);
+  const [isloading, setisloading] = useState(true);
+  const [chats, setchats] = useState(null);
   const navigation = useNavigation();
+
+  useLayoutEffect(() => {
+    const chatQuery = query(
+      collection(firestoreDB, "chats"),
+      orderBy("_id", "desc")
+    );
+
+    const unsubscribe = onSnapshot(chatQuery, (querySnapshot) => {
+      const chatRooms = querySnapshot.docs.map((doc) => doc.data());
+      setchats(chatRooms);
+      setisloading(false);
+    });
+
+    // stop updates
+    return unsubscribe;
+  }, []);
 
   return (
     <View className=" flex-1 ">
@@ -41,7 +60,7 @@ const HomeScreen = () => {
                 Messsages
               </Text>
               <TouchableOpacity
-                onPress={() => navigation.navigate("AddTochatScreen" )}
+                onPress={() => navigation.navigate("AddTochatScreen")}
               >
                 <Ionicons name="chatbox" size={28} color={"#555"} />
               </TouchableOpacity>
@@ -55,24 +74,15 @@ const HomeScreen = () => {
               </>
             ) : (
               <>
-                <MessageCard />
-                <MessageCard />
-                <MessageCard />
-                <MessageCard />
-                <MessageCard />
-                <MessageCard />
-                <MessageCard />
-                <MessageCard />
-                <MessageCard />
-                <MessageCard />
-                <MessageCard />
-                <MessageCard />
-                <MessageCard />
-                <MessageCard />
-                <MessageCard />
-                <MessageCard />
-                <MessageCard />
-                <MessageCard />
+                {chats && chats.length > 0 ? (
+                  <>
+                    {chats?.map((room) => (
+                      <MessageCard key={room._id} room={room} />
+                    ))}
+                  </>
+                ) : (
+                  <></>
+                )}
               </>
             )}
           </View>
@@ -82,9 +92,13 @@ const HomeScreen = () => {
   );
 };
 
-const MessageCard = () => {
+const MessageCard = ({ room }) => {
+  const navigation = useNavigation();
   return (
-    <TouchableOpacity className=" w-full flex-row items-center justify-start py-2">
+    <TouchableOpacity
+      onPress={() => navigation.navigate("ChatScreen", { room: room })}
+      className=" w-full flex-row items-center justify-start py-2"
+    >
       {/* image */}
       <View className=" w-16 h-16 rounded-full flex items-center border-2 border-primary p-1 justify-center">
         <FontAwesome5 name="users" size={24} color="#555" />
@@ -93,7 +107,7 @@ const MessageCard = () => {
       {/* content */}
       <View className=" flex flex-1 items-start justify-start ml-4">
         <Text className="text-[#333] text-base font-semibold capitalize">
-          message title
+          {room.chatName}
         </Text>
 
         <Text className=" text-primaryText text-sm">

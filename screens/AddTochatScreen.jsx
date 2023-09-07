@@ -33,8 +33,9 @@ const AddTochatScreen = () => {
   };
 
   return (
-    <View className=" flex-1">
-      <View className=" w-full bg-secondary px-4 py-6 flex-[0.12]">
+    
+    <View className=" flex-1 ">
+      <View className=" w-full bg-secondary px-4 py-3 flex-[0.2]">
         <View className="flex-row items-center justify-between w-full px-4 py-12">
           {/* back */}
           <TouchableOpacity onPress={() => navigation.goBack()}>

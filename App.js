@@ -5,6 +5,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import {
   AddTochatScreen,
+  ChatScreen,
   HomeScreen,
   LoginScreen,
   Signupscreen,
@@ -26,6 +27,7 @@ const App = () => {
           <Stack.Screen name="Signupscreen" component={Signupscreen} />
           <Stack.Screen name="HomeScreen" component={HomeScreen} />
           <Stack.Screen name="AddTochatScreen" component={AddTochatScreen} />
+          <Stack.Screen name="ChatScreen" component={ChatScreen} />
         </Stack.Navigator>
       </Provider>
     </NavigationContainer>
