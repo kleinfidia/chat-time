@@ -7,7 +7,7 @@ import {
   ScrollView,
   ActivityIndicator,
 } from "react-native";
-import React, { useRef, useState } from "react";
+import React, { useLayoutEffect, useRef, useState } from "react";
 import { TouchableOpacity } from "react-native";
 import {
   Entypo,
@@ -18,7 +18,15 @@ import {
 } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { KeyboardAvoidingView } from "react-native";
-import { addDoc, collection, doc, serverTimestamp } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  doc,
+  onSnapshot,
+  orderBy,
+  query,
+  serverTimestamp,
+} from "firebase/firestore";
 import { useSelector } from "react-redux";
 import { firestoreDB } from "../configs/firebase.config";
 
@@ -29,6 +37,10 @@ const ChatScreen = ({ route }) => {
   const textInputRef = useRef(null);
 
   const user = useSelector((state) => state.user.user);
+
+  const [isloading, setisloading] = useState(false);
+  const [message, setmessage] = useState("");
+  const [messages, setmessages] = useState(null);
 
   const handleKeyboardOpen = () => {
     if (textInputRef.current) {
@@ -41,22 +53,34 @@ const ChatScreen = ({ route }) => {
     const id = `${Date.now()}`;
     const _doc = {
       _id: id,
-      roomId: room._id, 
+      roomId: room._id,
       timestamp: timestamp,
       message: message,
       user: user,
     };
     setmessage("");
     await addDoc(
-      collection(doc(firestoreDB, "chats", room._id), "messsages"),
+      collection(doc(firestoreDB, "chats", room._id), "messages"),
       _doc
     )
       .then(() => {})
       .catch((err) => alert(err));
   };
 
-  const [isloading, setisloading] = useState(false);
-  const [message, setmessage] = useState("");
+  useLayoutEffect(() => {
+    const msgQuery = query(
+      collection(firestoreDB, "chats", room?._id, "messages"),
+      orderBy("timestamp", "asc")
+    );
+    const unsubscribe = onSnapshot(msgQuery, (querySnap) => {
+      const upMsg = querySnap.docs.map((doc) => doc.data());
+      setmessages(upMsg);
+      setisloading(false);
+    });
+
+    return unsubscribe;
+  }, []);
+
   return (
     <View className=" flex-1 ">
       <View className=" w-full bg-secondary px-4 py-3flex-[0.2]">
@@ -113,7 +137,72 @@ const ChatScreen = ({ route }) => {
                   </View>
                 </>
               ) : (
-                <></>
+                <>
+                  {messages?.map((msg, i) =>
+                    msg.user.providerData.email === user.providerData.email ? (
+                      <View className=" m-1" key={i}>
+                        <View
+                          style={{ alignSelf: "flex-end" }}
+                          className=" px-4 py-2 rounded-tl-2xl rounded-tr-2xl rounded-bl-2xl bg-secondary w-auto relative "
+                        >
+                          <Text className="text-base font-semibold text-white">
+                            {msg.message}
+                          </Text>
+                        </View>
+                        <View style={{ alignSelf: "flex-end" }}>
+                          {msg?.timestamp?.seconds && (
+                            <Text className="text-[12px] text-black font-semibold">
+                              {new Date(
+                                parseInt(msg?.timestamp?.seconds) * 1000
+                              ).toLocaleTimeString("en-US", {
+                                hour: "numeric",
+                                minute: "numeric",
+                                hour12: true,
+                              })}
+                            </Text>
+                          )}
+                        </View>
+                      </View>
+                    ) : (
+                      <View
+                        key={i}
+                        style={{ alignSelf: "flex-start" }}
+                        className="flex items-center justify-start space-x-2"
+                      >
+                        <View className=" flex-row items-center justify-center space-x-2">
+                          {/* profile image */}
+                          <Image
+                            className=" w-12 h-12 rounded-full"
+                            resizeMode="cover"
+                            source={{ uri: msg?.user?.profilePic }}
+                          />
+
+                          {/* text */}
+                          <View className=" m-1">
+                            <View className=" px-4 py-2 rounded-tl-2xl rounded-tr-2xl rounded-bl-2xl bg-secondaryone w-auto relative ">
+                              <Text className="text-base font-semibold text-black">
+                                {msg.message}
+                              </Text>
+                            </View>
+                            <View style={{ alignSelf: "flex-start" }}>
+                              {msg?.timestamp?.seconds && (
+                                <Text className="text-[12px] text-black font-semibold">
+                                  {new Date(
+                                    parseInt(msg?.timestamp?.seconds) * 1000
+                                  ).toLocaleTimeString("en-US", {
+                                    hour: "numeric",
+                                    minute: "numeric",
+                                    hour12: true,
+                                  })}
+                                </Text>
+                              )}
+                            </View>
+                          </View>
+                        </View>
+                      </View>
+                    )
+                  )}
+                </>
               )}
             </ScrollView>
             <View className=" w-full flex-row items-center justify-center px-7 space-x-3">
