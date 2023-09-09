@@ -1,2 +1,2 @@
 # chat-time
-Chat application using expo and <<firebase authentication
+## real-time Chat application using expo and firebase authentication
